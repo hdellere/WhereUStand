@@ -9,19 +9,26 @@ the retrieved image.
 import Tokens
 import time
 from twitter import Twitter, OAuth
-tweetInOld = 0
+
+
 # Set up twitter authentification
 twitter = Twitter(
     retry=True,
     auth=OAuth(Tokens.token, Tokens.tokenSecret, Tokens.key, Tokens.keySecret))
 
 #  Main Loop
+tweetInOld = 0
 while(1):
-    time.sleep(120)
-    tweetIn = twitter.statuses.home_timeline(count=1)
-    if (tweetIn[0]['user']['screen_name'] !=
-       tweetInOld[0]['user']['screen_name']):
-            # Checks to see if a new tweet it present
+    time.sleep(60)
+    tweetIn = twitter.statuses.home_timeline()
+    if tweetInOld == 0:
+        tweetInOld = tweetIn
+        userName = tweetIn[0]['user']['name']
+        tweetText = tweetIn[0]['text']
+        print(userName, tweetText)
+    elif (tweetIn[0]['user']['screen_name'] !=
+          tweetInOld[0]['user']['screen_name']):
+        # Checks to see if a new tweet it present
         tweetInOld = tweetIn
         userName = tweetIn[0]['user']['name']
         tweetText = tweetIn[0]['text']
