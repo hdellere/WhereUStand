@@ -9,7 +9,7 @@ the retrieved image.
 import Tokens
 import time
 from twitter import Twitter, OAuth
-
+import re
 
 # Set up twitter authentification
 twitter = Twitter(
@@ -19,17 +19,27 @@ twitter = Twitter(
 #  Main Loop
 tweetInOld = 0
 while(1):
-    time.sleep(60)
-    tweetIn = twitter.statuses.home_timeline()
-    if tweetInOld == 0:
+    time.sleep(75)  # API Timer delay
+    tweetIn = twitter.statuses.home_timeline()  # Pulls current timeline
+    """Not quite sure how to make these two if statements into one, need the
+    first on right now to take care of the first iteration when the
+    tweetInOld is not valid for JSON extraction"""
+    if tweetInOld == 0:  # First iteration
         tweetInOld = tweetIn
-        userName = tweetIn[0]['user']['name']
+        userName = tweetIn[0]['user']['name']  # Most recent tweet on timeline
         tweetText = tweetIn[0]['text']
-        print(userName, tweetText)
+        normalText = str(tweetText)  # Makes JSON a string
+        print(normalText.lower())  # Test
+        print(userName, tweetText)  # Test
+        calloutCheck = re.search(r'@ksu_bell', normalText.lower())
+    # Checks to see if a new tweet it present
     elif (tweetIn[0]['user']['screen_name'] !=
           tweetInOld[0]['user']['screen_name']):
-        # Checks to see if a new tweet it present
         tweetInOld = tweetIn
         userName = tweetIn[0]['user']['name']
         tweetText = tweetIn[0]['text']
-        print(userName, tweetText)
+        normalText = str(tweetText)
+        calloutCheck = re.search(r'@ksu_bell', normalText.lower())
+    if calloutCheck:
+        handle = calloutCheck.group()  # If executed, handle is present
+        print(handle)
